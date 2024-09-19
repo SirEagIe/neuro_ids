@@ -28,13 +28,13 @@ services:
         extra_hosts:
             - "web:127.0.0.1"
             - "redis:127.0.0.1"
-            #        deploy:
-            #resources:
-            #    limits:
-            #        cpus: '0.50'
-            #        memory: 500M
-            #    reservations:
-            #        cpus: '0.25'
-            #       memory: 250M
+        deploy:
+            resources:
+              limits:
+                cpus: '0.50'
+                memory: 500M
+              reservations:
+                cpus: '0.25'
+                memory: 250M
         restart: always
 

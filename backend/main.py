@@ -15,7 +15,7 @@ redis = Redis(host='redis', port=6379)
 
 
 @celery_client.task
-def sniff_flows():
+def sniff_flows_train():
     os.remove('flows.csv')
     connections = {}
     def packet_process(pkt):
