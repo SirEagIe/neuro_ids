@@ -11,17 +11,18 @@ redis = Redis(host='redis', port=6379)
 def start():
     redis.set('started', 'true')
     task = celery_client.send_task('main.sniff_flows')
-    task = celery_client.send_task('main.train')
+    return str(task.status)
+
+@app.route('/start_detect')
+def start_detect():
+    redis.set('started', 'true')
+    task = celery_client.send_task('main.sniff_flows_detect')
     return str(task.status)
 
 @app.route('/stop')
 def stop():
-    #i = celery_client.control.inspect()
-    #for j in i.active().keys():
-    #    for k in i.active()[j]:
-    #        celery_client.control.revoke(k['id'], terminate=True, signal='SIGKILL')
-    #return str(i.active())
     redis.set('started', 'false')
+    return 'done'
 
 @app.route('/status')
 def status():
