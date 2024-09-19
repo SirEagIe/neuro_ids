@@ -11,37 +11,31 @@
 <script>
     function start_train() {
         fetch('/start_train')
-        document.getElementById('status').innerHTML = 'starting...'
-        document.getElementById('start_train').disabled = true
-        document.getElementById('start_detect').disabled = true
-        document.getElementById('stop').disabled = false
     }
     function start_detect() {
         fetch('/start_detect')
-        document.getElementById('status').innerHTML = 'starting...'
-        document.getElementById('start_train').disabled = true
-        document.getElementById('start_detect').disabled = true
-        document.getElementById('stop').disabled = false
     }
     function stop() {
         fetch('/stop')
-        document.getElementById('status').innerHTML = 'stoping...'
     }
     function update_status() {
         fetch('/status').then(response => response.json()).then(res => {
-	    if (document.getElementById('status').innerHTML != 'starting...' || res.status != 'stopped') {
-                document.getElementById('status').innerHTML = res.status
-	        if (res.status == 'stopped') {
-	            document.getElementById('start_train').disabled = false
-	            document.getElementById('start_detect').disabled = false
-		    document.getElementById('stop').disabled = true
-	        }
-	        else {
-	            document.getElementById('start_train').disabled = true
-                    document.getElementById('start_detect').disabled = true
-                    document.getElementById('stop').disabled = false
-		}
-            }
+            document.getElementById('status').innerHTML = res.status
+	    if (res.status == 'stopped') {
+	        document.getElementById('start_train').disabled = false
+	        document.getElementById('start_detect').disabled = false
+	        document.getElementById('stop').disabled = true
+	    }
+	    else if (res.status == 'sniff for tarin' || res.status == 'detect') {
+	        document.getElementById('start_train').disabled = true
+                document.getElementById('start_detect').disabled = true
+                document.getElementById('stop').disabled = false
+	    }
+	    else {
+                document.getElementById('start_train').disabled = true
+                document.getElementById('start_detect').disabled = true
+                document.getElementById('stop').disabled = true 
+	    }
 	})
         setTimeout(update_status, 3000)
     }

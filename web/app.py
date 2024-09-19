@@ -13,18 +13,16 @@ def index():
 
 @app.route('/start_train')
 def start_train():
-    i = celery_client.control.inspect().active()
-    if list(i.values()) != [[]]:
-        return 'Already started'
+    if redis.get('started') == b'true':
+        return {'code': '403'}
     redis.set('started', 'true')
     task = celery_client.send_task('main.sniff_flows_train')
     return {'code': '200'}
 
 @app.route('/start_detect')
 def start_detect():
-    i = celery_client.control.inspect().active()
-    if list(i.values()) != [[]]:
-        return 'Already started'
+    if redis.get('started') == b'true':
+        return {'code': '403'}
     redis.set('started', 'true')
     task = celery_client.send_task('main.sniff_flows_detect')
     return {'code': '200'}
@@ -38,15 +36,19 @@ def stop():
 def status():
     i = celery_client.control.inspect().active()
     r = redis.get('started')
-    if list(i.values()) == [[]]:
+    if list(i.values()) == [[]] and (r == b'false' or not r):
         return {'status': 'stopped'}
+    elif list(i.values()) == [[]] and r == b'true':
+        return {'status': 'starting...'}
     elif list(i.values())[0][0].get('name') == 'main.sniff_flows_train' and r == b'true':
         return {'status': 'sniff for tarin'}
     elif list(i.values())[0][0].get('name') == 'main.sniff_flows_train' and r == b'false':
         return {'status': 'model tarin'}
-    elif list(i.values())[0][0].get('name') == 'main.sniff_flows_detect':
+    elif list(i.values())[0][0].get('name') == 'main.sniff_flows_detect' and r == b'true':
         return {'status': 'detect'}
-    return {'status': 'stopped'}
+    elif list(i.values())[0][0].get('name') == 'main.sniff_flows_detect' and r == b'false':
+        return {'status': 'stoping...'}
+    return {'status': '...'}
 
 if __name__ == '__main__':
     app.run('0.0.0.0')
