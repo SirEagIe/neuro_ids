@@ -1,4 +1,5 @@
 scikit-learn
 redis
-celery
 scapy
+apscheduler
+flask
