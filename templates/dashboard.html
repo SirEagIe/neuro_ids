@@ -1,0 +1,153 @@
+<head>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm navbar-light bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand fs-3 ms-3" href="/" style='color: aliceblue;'>Neural IDS</a>
+            <div class="collapse navbar-collapse" id="navbarID">
+                <div class="navbar-nav">
+                    <a class="nav-link active fs-5" aria-current="page" style='color: aliceblue;' href="/dashboard">Дашборд</a>
+                    <a class="nav-link active fs-5" aria-current="page" style='color: aliceblue;' href="/incidents">Инциденты</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col text-center">
+                <span class="fs-3">Легитимные сессии</span>
+                <table id="myTable1" class="display">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>flow</th>
+                            <th>src_ip</th>
+                            <th>src_port</th>
+                            <th>dst_ip</th>
+                            <th>dst_port</th>
+                            <th>protocol</th>
+                            <th>start_time</th>
+                            <th>duration</th>
+                            <th>label</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col text-center">
+                <span class="fs-3">Аномальные сессии</span>
+                <table id="myTable2" class="display">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>flow</th>
+                            <th>src_ip</th>
+                            <th>src_port</th>
+                            <th>dst_ip</th>
+                            <th>dst_port</th>
+                            <th>protocol</th>
+                            <th>start_time</th>
+                            <th>duration</th>
+                            <th>label</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function format(d) {
+            return (
+                '<dl>' +
+                '<dd>flow: ' + d.flow + '</dd>' +
+                '<dd>src: ' + d.src + '</dd>' +
+                '<dd>sport: ' + d.sport + '</dd>' +
+                '<dd>dst: ' + d.dst + '</dd>' +
+                '<dd>dport: ' + d.dport + '</dd>' +
+                '<dd>protocol: ' + d.protocol + '</dd>' +
+                '<dd>start_time: ' + d.start_time + '</dd>' +
+                '<dd>duration: ' + d.duration + '</dd>' +
+                '<dd>total_fwd_packets: ' + d.total_fwd_packets + '</dd>' +
+                '<dd>len_fwd_packets_total: ' + d.len_fwd_packets_total + '</dd>' +
+                '<dd>len_fwd_packets_max: ' + d.len_fwd_packets_max + '</dd>' +
+                '<dd>len_fwd_packets_mean: ' + d.len_fwd_packets_mean + '</dd>' +
+                '<dd>flow_iat_min: ' + d.flow_iat_min + '</dd>' +
+                '<dd>fwd_iat_std: ' + d.fwd_iat_std + '</dd>' +
+                '<dd>fwd_iat_max: ' + d.fwd_iat_max + '</dd>' +
+                '<dd>fwd_iat_min: ' + d.fwd_iat_min + '</dd>' +
+                '<dd>fwd_header_len: ' + d.fwd_header_len + '</dd>' +
+                '<dd>len_packet_max: ' + d.len_packet_max + '</dd>' +
+                '<dd>len_packet_mean: ' + d.len_packet_mean + '</dd>' +
+                '<dd>label: ' + d.label + '</dd>' +
+                '</dl>'
+            );
+        }
+
+        let table1 = new DataTable('#myTable1', {
+            ajax: '/data-benign',
+            columns: [
+                {
+                    className: 'dt-control',
+                    orderable: false,
+                    data: null,
+                    defaultContent: ''
+                },
+                { data: 'flow' },
+                { data: 'src' },
+                { data: 'sport' },
+                { data: 'dst' },
+                { data: 'dport' },
+                { data: 'protocol' },
+                { data: 'start_time' },
+                { data: 'duration' },
+                { data: 'label' },
+            ]
+        });
+        table1.on('click', 'td.dt-control', function (e) {
+            let tr = e.target.closest('tr');
+            let row = table1.row(tr);
+            if (row.child.isShown()) {
+                row.child.hide();
+            }
+            else {
+                row.child(format(row.data())).show();
+            }
+        });
+        let table2 = new DataTable('#myTable2', {
+            ajax: '/data-malicious',
+            columns: [
+                {
+                    className: 'dt-control',
+                    orderable: false,
+                    data: null,
+                    defaultContent: ''
+                },
+                { data: 'flow' },
+                { data: 'src' },
+                { data: 'sport' },
+                { data: 'dst' },
+                { data: 'dport' },
+                { data: 'protocol' },
+                { data: 'start_time' },
+                { data: 'duration' },
+                { data: 'label' },
+            ]
+        });
+        table2.on('click', 'td.dt-control', function (e) {
+            let tr = e.target.closest('tr');
+            let row = table2.row(tr);
+            if (row.child.isShown()) {
+                row.child.hide();
+            }
+            else {
+                row.child(format(row.data())).show();
+            }
+        });
+    </script>
+</body>
